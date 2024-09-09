@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Service Provider</title>
+    <style>
+        a {text-decoration: none; color: #000; padding: 10px 14px; border: solid 2px #555; border-radius: 10px; cursor: pointer;}
+        a:hover {background-color: #555; color: #faf2fa;}
+        a:active {background-color: #333; color: #faf2fa;}
+        li > div:nth-child(2) {font-family: monospace; letter-spacing: 0.5px; margin-top: 0.2em; margin-bottom: 0.8em; margin-left: 1em;}
+    </style>
+</head>
+<body>
+    <div style="text-align: center;">
+        <h2>SAML Service Provider Sample</h2>
+        <div style="background-color: #373737; color: #fff; min-height: 600px; padding: 1em 20%; margin-bottom: 2em; font-size: 0.925em; text-align: left;">
+            <ul>
+                <li>
+                    <div>사용자 정보 : </div>
+                    <div th:text="${samlUser}">samlUser</div>
+                </li>
+                <li>
+                    <div>SP AuthnRequest : </div>
+                    <div th:text="${spSamlString}">spSamlString</div>
+                </li>
+                <li>
+                    <div>IDP Response : </div>
+                    <div th:text="${idpSamlString}">idpSamlString</div>
+                </li>
+            </ul>
+        </div>
+        <a th:if="${samlUser == ''}" th:href="@{/proxy}">로그인</a>
+        <a th:if="${samlUser != ''}" th:href="@{/logout}">로그아웃</a>
+    </div>
+</body>
+<script th:inline="javascript">
+        var prettifyXml = function(sourceXml)
+    {
+        var xmlDoc = new DOMParser().parseFromString(sourceXml, 'application/xml');
+        var xsltDoc = new DOMParser().parseFromString([
+            // describes how we want to modify the XML - indent everything
+            '<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform">',
+            '  <xsl:strip-space elements="*"/>',
+            '  <xsl:template match="para[content-style][not(text())]">', // change to just text() to strip space in text nodes
+            '    <xsl:value-of select="normalize-space(.)"/>',
+            '  </xsl:template>',
+            '  <xsl:template match="node()|@*">',
+            '    <xsl:copy><xsl:apply-templates select="node()|@*"/></xsl:copy>',
+            '  </xsl:template>',
+            '  <xsl:output indent="yes"/>',
+            '</xsl:stylesheet>',
+        ].join('\n'), 'application/xml');
+
+        var xsltProcessor = new XSLTProcessor();
+        xsltProcessor.importStylesheet(xsltDoc);
+        var resultDoc = xsltProcessor.transformToDocument(xmlDoc);
+        var resultXml = new XMLSerializer().serializeToString(resultDoc);
+        return resultXml;
+    };
+
+    console.log(prettifyXml( [[${idpSamlString}]] ));
+</script>
+</html>

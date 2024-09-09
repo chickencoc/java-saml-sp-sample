@@ -1,0 +1,24 @@
+server:
+  port: 9106
+  servlet:
+    context-path:
+    session:
+      timeout: 3600
+
+sp:
+  entity_id: saml-sample
+  single_sign_on_service_location: 
+  single_logout_service_location: 
+  acs: /acs # assertion customer service url
+  login_url: /sso/saml2 # 사용은 되는데 어떻게 url을 타는지 잘 모르겠음
+
+logging:
+  level:
+    root: info
+    saml.example.sp: debug
+    # debug filter chain
+#     org.springframework.security.web.FilterChainProxy: debug
+
+
+# saml example site
+# https://developers.onelogin.com/saml/examples/authnrequest
